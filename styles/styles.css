@@ -1,0 +1,239 @@
+/* ==========================================================================
+   Parallax Explorer -- sim-specific styles ONLY.
+   The shared look/layout comes from foundation/kl-unl.css (never edited).
+   Everything here layers on top of the foundation classes.
+   ========================================================================== */
+
+/* Comfortable, zoomable base type (rule 10: >=1.125rem floor). */
+body {
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+/* Give the page a little breathing room around the shell. */
+.app-shell {
+  padding: 0.5rem;
+}
+
+/* Spacing between the grid columns / stacked panels (foundation gap is 0). */
+.app-layout {
+  gap: 0.75rem;
+}
+
+/* Desktop / iPad landscape: make the Map the dominant column.
+   Scoped to min-width so the foundation's 56rem single-column collapse
+   (max-width:56rem) stays intact below this. */
+@media (min-width: 56.01rem) {
+  .app-layout {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    align-items: stretch;            /* both columns share the row height */
+  }
+  /* Right column fills the map's height; Controls grows so the two panel
+     bottoms line up with the bottom of the Map panel. */
+  .pe-right > .pe-panel:last-child {
+    flex: 1 1 auto;
+  }
+}
+
+/* Right column stacks Observer's View above Controls. */
+.pe-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.pe-panel {
+  border: 1px solid var(--border-color, #767676);
+  border-radius: 4px;
+}
+
+.pe-panel .panel__heading {
+  font-size: 1.125rem;
+  color: #333;
+  border-bottom: 1px solid #cccccc;
+}
+
+/* Small gap between the canvas artwork and the panel border (Map + View). */
+.pe-panel .panel__canvas-wrap {
+  padding: 0.5rem 0.75rem 0.75rem;
+}
+
+/* Thin gray frame around the artwork, matching the original (map border =
+   shapes/222.svg, #999999), inset from the panel border by the wrap padding. */
+.pe-map-stage,
+.pe-view-stage {
+  box-sizing: border-box;
+  border: 1px solid #999999;
+}
+
+/* --------------------------------------------------------------------------
+   MAP stage: native 461x515 canvas, scaled by CSS, with positioned overlays.
+   -------------------------------------------------------------------------- */
+.pe-map-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 461 / 515;
+  line-height: 0;
+}
+
+.pe-view-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 250 / 103;
+}
+
+.pe-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;              /* draggable canvas: don't scroll/zoom page */
+}
+
+/* Zoomable HTML map labels (replace canvas-baked text). */
+.pe-map-label {
+  position: absolute;
+  transform: translateX(-50%);
+  font-weight: bold;
+  line-height: 1;
+  pointer-events: none;
+  font-size: clamp(0.8rem, 2.2vw, 1.05rem);
+}
+.pe-map-label--lake { left: 50%; top: 2.6%; color: #0097a4; }
+.pe-map-label--road { left: 50%; top: 97%; color: #666666; }
+
+/* Focus/drag proxies for the observer marker and ruler.
+   pointer-events:none so the canvas handles pointer hit-testing directly;
+   they remain keyboard-focusable and show a focus ring over their target. */
+.pe-drag-proxy {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: none;
+  border-radius: 4px;
+}
+.pe-drag-proxy:focus-visible {
+  outline-width: 0.1875rem;
+  outline-style: solid;
+  outline-color: var(--outline-color, #005fcc);
+  outline-offset: 2px;
+}
+
+/* Observer marker proxy: >=44px touch/target box centred on the red X. */
+#pe-observer {
+  width: 2.75rem;
+  height: 2.75rem;
+  transform: translate(-50%, -50%);
+}
+
+/* Ruler proxy: tall vertical strip over the ruler art. */
+.pe-ruler-proxy {
+  top: 1%;
+  height: 93%;
+  width: 3rem;
+  transform: translateX(-50%);
+}
+
+/* --------------------------------------------------------------------------
+   CONTROLS
+   -------------------------------------------------------------------------- */
+.control-fieldset {
+  padding-top: 0.75rem;
+}
+
+/* Preset row: label + select. */
+.pe-row-preset {
+  grid-template-columns: 1fr;   /* label is screen-reader-only; select fills */
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+}
+.pe-select {
+  min-height: 2.75rem;
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  color: var(--foreground-color, #1a1a1a);
+  background: var(--background-color, #ffffff);
+  border: 1px solid var(--border-color, #767676);
+  border-radius: 4px;
+}
+
+/* Error row: label | boxed readout | slider, aligned on a shared baseline. */
+.pe-row-error {
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.5rem 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.pe-row-error .control-row__label {
+  justify-self: end;
+}
+.pe-readout {
+  display: inline-block;
+  min-width: 3.75rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  padding: 0.3rem 0.5rem;
+  color: var(--foreground-color, #1a1a1a);
+  background: var(--background-color, #ffffff);
+  border: 1px solid var(--border-color, #767676);
+  border-radius: 4px;
+}
+.pe-eqn { display: none; }        /* MathJax hook; visible readout is .pe-readout */
+
+.pe-slider {
+  width: 100%;
+  min-height: 1.75rem;
+  cursor: pointer;
+}
+.pe-slider:disabled { cursor: default; opacity: 0.5; }
+
+/* Measurement buttons: equal size, stacked, comfortable tap targets. */
+.pe-button-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+}
+.pe-button {
+  width: 100%;
+  min-height: 2.75rem;
+  font-size: 1rem;
+  color: var(--button-foreground-color, #ffffff);
+  background: var(--button-background-color, #005a9c);
+  border: 1px solid var(--border-color, #767676);
+  border-radius: 4px;
+  font-weight: 600;
+}
+.pe-button:hover, .pe-button:focus-visible {
+  filter: brightness(0.92);
+}
+
+.pe-choice {
+  min-height: 2.75rem;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+.pe-choice label { font-size: 1rem; }
+
+.pe-scale-note {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* --------------------------------------------------------------------------
+   Phone portrait: single column, comfortable spacing (foundation collapses
+   the grid at 56rem; keep tap targets and prevent horizontal overflow).
+   -------------------------------------------------------------------------- */
+@media (max-width: 40rem) {
+  .app-shell { padding: 0.25rem; }
+  .pe-row-error { grid-template-columns: auto 1fr; }
+  .pe-slider { grid-column: 1 / -1; }
+}
+
+/* Respect reduced motion (this sim has no continuous animation, but keep the
+   declaration explicit for any future transitions). */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

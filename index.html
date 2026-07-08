@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parallax Explorer</title>
+  <link rel="stylesheet" href="foundation/kl-unl.css">
+  <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+  <main class="app-shell">
+
+    <!-- Title bar + Reset/About (Help suppressed: original helpLinkageName was "") -->
+    <kl-unl-masthead sim-id="parallaxExplorer" json-url="foundation/contents.json"></kl-unl-masthead>
+
+    <div class="app-layout">
+
+      <!-- ============ MAP (top-down view) ============ -->
+      <div class="app-layout__left">
+        <section class="panel pe-panel" aria-labelledby="pe-map-heading">
+          <h2 id="pe-map-heading" class="panel__heading">Map</h2>
+          <div class="panel__canvas-wrap">
+            <div class="pe-map-stage" id="pe-map-stage">
+              <canvas id="pe-map-canvas" class="pe-canvas"
+                      aria-describedby="pe-map-desc">
+              </canvas>
+
+              <!-- HTML labels (zoomable, replace canvas-baked text) -->
+              <span class="pe-map-label pe-map-label--lake" aria-hidden="true">lake</span>
+              <span class="pe-map-label pe-map-label--road" aria-hidden="true">road</span>
+
+              <!-- Keyboard/pointer-focusable proxy for the draggable observer marker -->
+              <div id="pe-observer" class="pe-drag-proxy" tabindex="0"
+                   role="slider" aria-orientation="horizontal"
+                   aria-label="Observer position along the road"
+                   aria-valuemin="9" aria-valuemax="221" aria-valuenow="100"
+                   aria-valuetext="Observer position 100 meters along the road"></div>
+
+              <!-- Keyboard/pointer-focusable proxy for the draggable ruler -->
+              <div id="pe-ruler" class="pe-drag-proxy pe-ruler-proxy" tabindex="0"
+                   role="slider" aria-orientation="horizontal" hidden
+                   aria-label="Ruler horizontal position"
+                   aria-valuemin="10" aria-valuemax="206" aria-valuenow="50"
+                   aria-valuetext="Ruler at horizontal position 50 meters"></div>
+            </div>
+          </div>
+          <p id="pe-map-desc" class="sr-only"></p>
+        </section>
+      </div>
+
+      <!-- ============ RIGHT COLUMN: Observer's View + Controls ============ -->
+      <div class="app-layout__right pe-right">
+
+        <!-- Observer's View (perspective / parallax) -->
+        <section class="panel pe-panel" aria-labelledby="pe-view-heading">
+          <h2 id="pe-view-heading" class="panel__heading">Observer's View</h2>
+          <div class="panel__canvas-wrap">
+            <div class="pe-view-stage">
+              <canvas id="pe-view-canvas" class="pe-canvas"
+                      aria-describedby="pe-view-desc"></canvas>
+            </div>
+          </div>
+          <p id="pe-view-desc" class="sr-only"></p>
+        </section>
+
+        <!-- Controls -->
+        <section class="panel pe-panel" aria-labelledby="pe-controls-heading">
+          <h2 id="pe-controls-heading" class="panel__heading">Controls</h2>
+
+          <fieldset class="control-fieldset">
+            <legend class="sr-only">Simulation controls</legend>
+
+            <!-- Preset selector (combo box) -->
+            <div class="control-row pe-row-preset">
+              <label class="sr-only" for="pe-preset">Preset</label>
+              <select id="pe-preset" class="pe-select">
+                <option value="0">Preset A</option>
+                <option value="1">Preset B</option>
+                <option value="2">Preset C</option>
+              </select>
+            </div>
+
+            <!-- Error slider -->
+            <div class="control-row pe-row-error">
+              <label class="control-row__label" for="pe-error">error:</label>
+              <output id="pe-error-out" class="pe-readout" for="pe-error">0.0&#176;</output>
+              <input type="range" id="pe-error" class="control-row__slider pe-slider"
+                     min="0" max="10" step="0.1" value="0"
+                     aria-valuetext="error 0.0 degrees">
+              <!-- MathJax-ready equation hook (activates only if the deployment
+                   provides MathJax; falls back to the text output above). -->
+              <span id="pe-error-eqn" class="pe-eqn" aria-hidden="true"></span>
+            </div>
+
+            <!-- Measurement buttons -->
+            <div class="pe-button-col">
+              <button type="button" id="pe-take" class="button pe-button">take measurement</button>
+              <button type="button" id="pe-clear" class="button pe-button">clear measurements</button>
+            </div>
+
+            <!-- Show ruler checkbox -->
+            <div class="control-choice pe-choice">
+              <input type="checkbox" id="pe-show-ruler">
+              <label for="pe-show-ruler">show ruler</label>
+            </div>
+
+            <!-- Scale note -->
+            <p class="pe-scale-note">map scale is 20 meters per ruler unit</p>
+          </fieldset>
+        </section>
+      </div>
+    </div>
+
+    <!-- Polite live region: announces state changes with units -->
+    <div id="pe-live" class="sr-only" aria-live="polite" role="status"></div>
+  </main>
+
+  <script src="foundation/kl-unl-masthead.js"></script>
+  <script src="foundation/kl-unl.js"></script>
+  <script type="module" src="simulation.js"></script>
+</body>
+</html>
