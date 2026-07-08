@@ -125,12 +125,14 @@ body {
   transform: translate(-50%, -50%);
 }
 
-/* Ruler proxy: tall vertical strip over the ruler art. */
+/* Ruler proxy: tall vertical strip overlaying the ruler art. Its left edge and
+   width (as a % of the 461px map) are set to match the ruler artwork, which is
+   drawn from the ruler's bottom-left registration point (see updateRulerProxy).
+   width = 45.2 / 461 = 9.8% of the map. */
 .pe-ruler-proxy {
-  top: 1%;
-  height: 93%;
-  width: 3rem;
-  transform: translateX(-50%);
+  top: 1.4%;
+  height: 93.4%;
+  width: 9.8%;
 }
 
 /* --------------------------------------------------------------------------

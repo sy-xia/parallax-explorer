@@ -518,7 +518,10 @@ function updateRulerProxy() {
   el.ruler.setAttribute('aria-valuenow', String(meters));
   el.ruler.setAttribute('aria-valuetext',
     'Ruler at horizontal position ' + meters + ' meters');
-  el.ruler.style.left = (px / MAP_W * 100) + '%';
+  // The ruler art is drawn from its bottom-left registration point at
+  // (rulerX - REG.ruler.x); align the proxy's left edge to the same spot so the
+  // focus ring frames the ruler (proxy width is set in CSS to the art width).
+  el.ruler.style.left = ((px - REG.ruler.x) / MAP_W * 100) + '%';
 }
 
 function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
@@ -536,9 +539,11 @@ function canvasPointFromEvent(ev) {
 }
 
 function hitTest(pt) {
-  // Ruler first (it sits on top when shown).
+  // Ruler first (it sits on top when shown). The ruler art spans roughly
+  // rulerX-0.55 .. rulerX+44.65 (bottom-left registration), so test around its
+  // centre (rulerX + ~22) across the full ruler height.
   if (state.showRuler &&
-      Math.abs(pt.x - state.rulerX) <= 24 && pt.y <= OBSERVER_Y + 8) {
+      Math.abs(pt.x - (state.rulerX + 22)) <= 26 && pt.y <= OBSERVER_Y + 8) {
     return 'ruler';
   }
   // Observer marker (generous target around the red X on the road).
