@@ -35,6 +35,7 @@ measuring. **Reset** restores Preset A.
 | `boat-side.svg` | `shapes/201.svg` | White sailboat, side view (Observer's View) |
 | `observer-x.svg` | `shapes/223.svg` | Red "X" observer marker |
 | `ruler.svg` | `shapes/168.svg` | Ruler (major divisions every 40 px) |
+| `tree.svg` | `shapes/198.svg` | Tree, placed on the far hills of the view |
 
 Only genuinely code-drawn geometry is reproduced on the canvas: the measurement
 sight-lines/wedges (`Map.as` `beginFill`/`lineTo`), the observer's left/right
@@ -104,6 +105,13 @@ on the canvas as text using the verbatim digits from `texts/169.txt … 179.txt`
    native `<input type="range">`; the range is the single, fully keyboard-operable
    control for the value. Functionally equivalent (sets the same `error` state).
 4. **Observer's-View absolute framing approximated** (see Rendering, above).
+5. **Far-shore trees re-placed by hand.** The trees on the hills (reused shape
+   `198`) are separate overlaid sprites in the original View Window, not part of
+   the panorama strip (`197`, which is only sky/hills/water gradients). Their
+   exact FLA placements are not in the decompiled ActionScript, so the tree
+   positions/scales (`TREES` in `simulation.js`, in panorama-strip coordinates)
+   were tuned against the original screenshots. They scroll with the panorama and
+   act as the fixed reference points that make the boat's parallax shift visible.
 
 ## The contents.json entry
 No entry needed to be **added**: the shared `foundation/contents.json` already

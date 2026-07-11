@@ -24,7 +24,8 @@ const ASSETS = {
   boatTop:       'assets/boat-top.svg',       // shape 229: orange boat (map)
   boatSide:      'assets/boat-side.svg',      // shape 201: white boat (view)
   observerX:     'assets/observer-x.svg',     // shape 223: red X marker
-  ruler:         'assets/ruler.svg'           // shape 168: measuring ruler
+  ruler:         'assets/ruler.svg',          // shape 168: measuring ruler
+  tree:          'assets/tree.svg'            // shape 198: tree (far shore)
 };
 
 // Registration offsets (pixel location of the symbol origin inside each SVG).
@@ -32,7 +33,8 @@ const REG = {
   boatTop:   { x: 13.45, y: 15.55 }, // matrix(...,13.45,15.55)
   observerX: { x: 9.0,   y: 9.0 },   // matrix(...,9,9) -> centre
   ruler:     { x: 0.55,  y: 480.5 }, // matrix(...,0.55,480.5) -> bottom-left
-  boatSide:  { x: 6.1,   y: 16.95 }  // matrix(...,6.1,16.95) -> bottom-centre
+  boatSide:  { x: 6.1,   y: 16.95 }, // matrix(...,6.1,16.95) -> bottom-centre
+  tree:      { x: 17.9,  y: 42.5 }   // matrix(...,17.9,42.5) -> base/centre
 };
 
 // ---------------------------------------------------------------------------
@@ -65,6 +67,24 @@ const VIEW_W = 250;                       // Observer's-View viewport (stage px)
 const VIEW_H = 103;
 const VIEW_CX = VIEW_W / 2;               // boat is always centred in the view
 const HALF_PI = Math.PI / 2;
+
+// Trees on the far shore (reused shape 198), placed on the hills of the
+// panorama so they scroll with it -- they are the fixed reference points that
+// make the boat's parallax shift visible. Positions are in panorama-strip
+// coordinates (0..STRIP_W); { sx: strip x, y: canvas base y, s: scale }.
+// (The original FLA's exact tree placements are not in the decompiled AS; these
+// are tuned against the original screenshots -- see CONVERSION_NOTES.)
+const TREES = [
+  { sx: 300, y: 40, s: 0.30 },
+  { sx: 470, y: 41, s: 0.34 },
+  { sx: 545, y: 39, s: 0.30 },
+  { sx: 690, y: 41, s: 0.34 },
+  { sx: 725, y: 43, s: 0.38 },
+  { sx: 760, y: 40, s: 0.30 },
+  { sx: 810, y: 42, s: 0.34 },
+  { sx: 880, y: 40, s: 0.30 },
+  { sx: 1000, y: 41, s: 0.32 }
+];
 
 // ---------------------------------------------------------------------------
 // Presets -- copied verbatim from p.presetsList in Parallax Explorer.as
@@ -356,6 +376,17 @@ function drawView() {
   const bgLeft = (VIEW_CX - STRIP_W / 2) + (angle - HALF_PI) * STRIP_SCALE;
   ctx.drawImage(images.panorama, 0, 0, STRIP_W, STRIP_H,
     bgLeft, 0, STRIP_W, VIEW_H);
+
+  // Trees on the far hills, scrolling with the panorama (same bgLeft offset).
+  for (const t of TREES) {
+    const cx = bgLeft + t.sx;
+    if (cx < -40 || cx > VIEW_W + 40) continue; // skip off-screen
+    ctx.save();
+    ctx.translate(cx, t.y);
+    ctx.scale(t.s, t.s);
+    ctx.drawImage(images.tree, -REG.tree.x, -REG.tree.y);
+    ctx.restore();
+  }
 
   // Boat: centred, sized/placed by z = (boatY - 30) / 370  (from onPresetSelected).
   const z = (state.boat.y - 30) / 370;
